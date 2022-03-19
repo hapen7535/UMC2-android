@@ -3,7 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/User/AndroidStudioProjects/example1/app/src/main/res/layout/activity_main.xml" value="0.17753623188405798" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/example1/app/src/main/res/drawable/btm_color_selector.xml" value="0.2265625" />
+        <entry key="..\:/Users/User/AndroidStudioProjects/example1/app/src/main/res/layout/activity_main.xml" value="0.4" />
       </map>
     </option>
   </component>
