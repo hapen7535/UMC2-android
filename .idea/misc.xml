@@ -5,6 +5,11 @@
       <map>
         <entry key="..\:/Users/User/AndroidStudioProjects/example1/app/src/main/res/drawable/btm_color_selector.xml" value="0.2265625" />
         <entry key="..\:/Users/User/AndroidStudioProjects/example1/app/src/main/res/layout/activity_main.xml" value="0.4" />
+        <entry key="..\:/Users/User/UMC2-android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.26153846153846155" />
+        <entry key="..\:/Users/User/UMC2-android/app/src/main/res/drawable/ic_launcher_background.xml" value="0.26153846153846155" />
+        <entry key="..\:/Users/User/UMC2-android/app/src/main/res/layout/activity_main.xml" value="0.17119565217391305" />
+        <entry key="..\:/Users/User/UMC2-android/app/src/main/res/layout/activity_song.xml" value="0.24947916666666667" />
+        <entry key="..\:/Users/User/UMC2-android/app/src/main/res/menu/bottom_nav_menu.xml" value="0.24947916666666667" />
       </map>
     </option>
   </component>
