@@ -1,6 +1,8 @@
 package com.example.example1
 
+import android.media.AsyncPlayer
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity //안드로이드에서 Activity의 기능들을 사용할 수 있도록 만들어둔 클래스가 AppCompatActivity이다
 import com.example.example1.databinding.ActivitySongBinding
 
@@ -21,5 +23,26 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
 
         }
 
+        binding.songMiniplayerIv.setOnClickListener{
+            setPlayerStatus(false)
+        }
+        binding.songPauseIv.setOnClickListener{
+            setPlayerStatus(true)
+        }
+
+
     }
+
+    fun setPlayerStatus(isPlaying: Boolean){
+
+        if(isPlaying){
+            binding.songPauseIv.visibility = View.GONE
+            binding.songMiniplayerIv.visibility = View.VISIBLE
+        }
+        else{
+            binding.songPauseIv.visibility = View.VISIBLE
+            binding.songMiniplayerIv.visibility = View.GONE
+        }
+    }
+
 }
