@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.mainPlayerCl.setOnClickListener{
+        binding.homePannelPlayIv.setOnClickListener{
 
             startActivity(Intent(this, SongActivity::class.java))
 
