@@ -1,8 +1,10 @@
 package com.example.example1
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import com.example.example1.databinding.ActivityMainBinding
 import com.example.example1.databinding.FragmentAlbumBinding
 
@@ -23,10 +25,12 @@ class MainActivity : AppCompatActivity() {
 
         }
         binding.homePannelAlbumIv.setOnClickListener{
+            Toast.makeText(this.applicationContext,"album 클릭", Toast.LENGTH_SHORT).show()
             supportFragmentManager.beginTransaction()
                 .replace(R.id.main_frm, AlbumFragment())
                 .commitNowAllowingStateLoss()
         }
+
 
     }
 
