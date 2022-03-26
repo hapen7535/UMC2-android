@@ -15,5 +15,11 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
         binding = ActivitySongBinding.inflate(layoutInflater) //inflate는 xml에 표기된 레이아웃들을 메모리에 객체화시키는 역할
         setContentView(binding.root) //xml에 있는 모든 객체들을 사용한다고 명시 xml의 최상단 뷰를 넣어주기 때문
 
+        binding.songDownIb.setOnClickListener{
+
+            finish() //액티비티 종료 처음에 연 액티비티로 돌아감
+
+        }
+
     }
 }
