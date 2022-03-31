@@ -1,5 +1,6 @@
 package com.example.example1
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,14 @@ class HomeFragment : Fragment(){
     ): View? {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val todayAlbum = layoutInflater.inflate(R.layout.item_album, null, false)
+        binding.homeTodayMusicAlbumRv.addView(todayAlbum)
+
+        todayAlbum.setOnClickListener{
+            (context as MainActivity).supportFragmentManager.beginTransaction()
+                .replace(R.id.main_frm , AlbumFragment())
+                .commitAllowingStateLoss()
+        }
 
         val bannerAdapter = BannerVPAdapter(this)
         bannerAdapter.addFragment(BannerFragment(R.drawable.img_home_viewpager_exp))
