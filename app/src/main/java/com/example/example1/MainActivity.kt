@@ -19,16 +19,9 @@ class MainActivity : AppCompatActivity() {
 
         initBottomNavigation()
 
-        binding.homePannelPlayIv.setOnClickListener{
-
-            startActivity(Intent(this, SongActivity::class.java))
-
-        }
-        binding.homePannelAlbumIv.setOnClickListener{
-            Toast.makeText(this.applicationContext,"album 클릭", Toast.LENGTH_SHORT).show()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.main_frm, AlbumFragment())
-                .commitNowAllowingStateLoss()
+        binding.mainPlayerCl.setOnClickListener {
+            val intent = Intent(this,SongActivity::class.java)
+            startActivity(intent)
         }
 
 
