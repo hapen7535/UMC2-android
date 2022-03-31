@@ -372,10 +372,11 @@
             android:id="@+id/home_banner_vp"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_marginTop="15dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/home_today_music_album_rv"/>
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/home_today_music_album_rv" />
 
         <TextView
             android:id="@+id/home_daily_music_title_tv"
