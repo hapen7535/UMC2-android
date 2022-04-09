@@ -12,7 +12,16 @@
         android:layout_height="0dp"
 
         app:layout_constraintBottom_toTopOf="@id/main_player_cl"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        tools:layout_editor_absoluteX="140dp" >
+
+        <ImageView
+            android:id="@+id/iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:srcCompat="@tools:sample/avatars" />
+    </FrameLayout>
 
     <SeekBar
         android:id="@+id/main_miniplayer_progress_sb"
