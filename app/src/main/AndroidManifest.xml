@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Example1">
         <activity
+            android:name=".ThreadExm"
+            android:exported="false" />
+        <activity
             android:name=".SongActivity"
             android:exported="false" />
         <activity
@@ -17,7 +20,7 @@
             android:exported="true">
             <intent-filter>
 
-                <!--                     intent-filter는 intent로 데이터를 전달할 때 다른 액티비티에도 이 코드가 적힐 수 있다 -->
+                <!-- intent-filter는 intent로 데이터를 전달할 때 다른 액티비티에도 이 코드가 적힐 수 있다 -->
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
