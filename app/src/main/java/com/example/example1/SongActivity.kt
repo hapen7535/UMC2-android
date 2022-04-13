@@ -53,7 +53,7 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
         val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE) //중지되면 재생되고 있던 노래의 데이터를 어딘가 저장해주기 위함
         val editor = sharedPreferences.edit()
         val songJson = gson.toJson(song)
-        editor.putString("song",songJson) //하나 하나 넣지 않고 데이터 객체 형태로 보내기 위해 JSON 포맷으로 변환한다.
+        editor.putString("songData",songJson) //하나 하나 넣지 않고 데이터 객체 형태로 보내기 위해 JSON 포맷으로 변환한다.
 
         editor.apply() //실제 저장이 된다.
     }
