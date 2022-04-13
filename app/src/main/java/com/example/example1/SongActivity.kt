@@ -1,11 +1,14 @@
 package com.example.example1
 
 import android.media.AsyncPlayer
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity //안드로이드에서 Activity의 기능들을 사용할 수 있도록 만들어둔 클래스가 AppCompatActivity이다
 import com.example.example1.databinding.ActivitySongBinding
+import com.google.gson.Gson
 
 class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신에 : 콜론으로 상속을 받는다 다른 클래스의 상속을 받을 때는 소괄호를 써준다(코틀린에서는)
 
@@ -14,6 +17,9 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
     //Binding은 Activity파일과 xml파일을 연결해주는 역할
     lateinit var song : Song
     lateinit var timer : Timer
+    private var mediaPlayer : MediaPlayer?= null //액티비티가 소멸될 때 미디어 플레이어 리소스를 해제시켜줘야 하므로 nullable ? 사용
+    private var gson : Gson = Gson()
+
 
     override fun onCreate(savedInstanceState: Bundle?) { //onCreate가 AppCompat안에 있으므로 override를 써준다
         super.onCreate(savedInstanceState)
@@ -39,10 +45,24 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
 
 
     }
+    //사용자가 포커스를 잃었을 때 음악 중지
+    override fun onPause() {
+        super.onPause()
+        setPlayerStatus(false)
+        song.second = ((binding.songProgressSb.progress * song.playTime)/100)/1000 //millisecond로 계산되므로 1000으로 나눠줌
+        val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE) //중지되면 재생되고 있던 노래의 데이터를 어딘가 저장해주기 위함
+        val editor = sharedPreferences.edit()
+        val songJson = gson.toJson(song)
+        editor.putString("songData",songJson) //하나 하나 넣지 않고 데이터 객체 형태로 보내기 위해 JSON 포맷으로 변환한다.
+
+        editor.apply() //실제 저장이 된다.
+    }
 
     override fun onDestroy() {
         super.onDestroy()
         timer.interrupt()
+        mediaPlayer?.release() //불필요한 리소스 해제를 위해 미디어 플레이어가 갖고 있던 리소스 해제
+        mediaPlayer = null //미디어 플레이어 또한 해제
     }
 
     private fun initSong(){
@@ -52,7 +72,8 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
                 intent.getStringExtra("singer")!!,
                 intent.getIntExtra("second", 0),
                 intent.getIntExtra("playTime", 0),
-                intent.getBooleanExtra("isPlaying", false)
+                intent.getBooleanExtra("isPlaying", false),
+                intent.getStringExtra("music")!!,
             )
         }
         startTimer()
@@ -64,7 +85,8 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
         binding.songStartTimeTv.text = String.format("%02d:%02d",song.second / 60, song.second % 60)
         binding.songEndTimeTv.text = String.format("%02d:%02d",song.playTime / 60, song.playTime % 60)
         binding.songProgressSb.progress = (song.second * 1000 / song.playTime)
-
+        val music = resources.getIdentifier(song.music, "raw", this.packageName)
+        mediaPlayer = MediaPlayer.create(this, music)
         setPlayerStatus(song.isPlaying)
     }
 
@@ -75,10 +97,14 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
         if(isPlaying){
             binding.songPauseIv.visibility = View.VISIBLE
             binding.songMiniplayerIv.visibility = View.GONE
+            mediaPlayer?.start()
         }
         else{
             binding.songPauseIv.visibility = View.GONE
             binding.songMiniplayerIv.visibility = View.VISIBLE
+            if(mediaPlayer?.isPlaying == true){ //마디어플레이어는 재생중이 아닌데 중지하게 되면 오류가 생기므로 예외처리를 해준다.
+                mediaPlayer?.pause()
+            }
         }
     }
 
