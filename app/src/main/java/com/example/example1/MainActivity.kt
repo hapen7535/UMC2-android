@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.Toast
 import com.example.example1.databinding.ActivityMainBinding
 import com.example.example1.databinding.FragmentAlbumBinding
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_Example1)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 
         //Thread 이용해서 이미지 바꾸는 실습
         //메인 Thread는 이미지 바꾸는 일을 계속함
@@ -68,25 +70,47 @@ class MainActivity : AppCompatActivity() {
 
         initBottomNavigation()
 
-        val song = Song(binding.mainMiniplayerTitleTv.text.toString(), binding.mainMiniplayerSingerTv.text.toString(),0,60,false)
+        val song = Song(binding.mainMiniplayerTitleTv.text.toString(), binding.mainMiniplayerSingerTv.text.toString(),0,60,false, "music_lilac")
 
-        binding.mainPlayerCl.setOnClickListener {
+        binding.mainMiniplayerTitleTv.setOnClickListener {
             val intent = Intent(this,SongActivity::class.java)
             intent.putExtra("title", song.title)
             intent.putExtra("singer", song.singer)
             intent.putExtra("second", song.second)
             intent.putExtra("playTime", song.playTime)
             intent.putExtra("isPlaying", song.isPlaying)
+            intent.putExtra("music",song.music)
             startActivity(intent)
         }
 
+        binding.mainMiniplayerBtn.setOnClickListener{
+            setPlayerStatus(true)
+        }
+        binding.mainPauseBtn.setOnClickListener{
+            setPlayerStatus(false)
+        }
 
+    }
 
+    fun setPlayerStatus(isPlaying: Boolean){
 
+        if(isPlaying){
+            binding.mainMiniplayerBtn.visibility = View.VISIBLE
+            binding.mainPauseBtn.visibility= View.GONE
+        }
+        else{
+            binding.mainMiniplayerBtn.visibility = View.GONE
+            binding.mainPauseBtn.visibility = View.VISIBLE
+        }
     }
 
 
     private fun initBottomNavigation(){
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_frm, HomeFragment())
+            .commitAllowingStateLoss()
+
         binding.mainBnv.setOnItemSelectedListener { item ->
             when(item.itemId){
                 R.id.homeFragment -> {
