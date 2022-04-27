@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         binding.mainMiniplayerProgressSb.progress = (song.second * 100000)/song.playTime
     }
 
+
     override fun onStart(){ //액티비티 전환이 될 때 onStart부터 시작이 되므로 만들어준다.
         //onStart()가 사용자에게 보여지기 직전의 함수이고 onResume()은 사용자에게 보여지고 난 후의 함수이므로
         // onStart()에서 UI와 관련된 코드를 초기화해주는 것이 더 안정적이다.
