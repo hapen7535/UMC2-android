@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.example1.databinding.FragmentHomeBinding
 
@@ -32,15 +33,26 @@ class HomeFragment : Fragment(){
 
         }
 
+        val albumRVAdapter = AlbumRVAdapter(albumDatas)
+        binding.homeTodayMusicAlbumRv.adapter = albumRVAdapter
+        binding.homeTodayMusicAlbumRv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-        val todayAlbum = layoutInflater.inflate(R.layout.item_album, null, false)
+        albumRVAdapter.setMyItemClickListner(object : AlbumRVAdapter.MyItemClickListener{
+            override fun onItemClick(){
+                (context as MainActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_frm, AlbumFragment())
+                    .commitAllowingStateLoss()
+            }
+        })
+
+       /* val todayAlbum = layoutInflater.inflate(R.layout.item_album, null, false)
         binding.homeTodayMusicAlbumRv.addView(todayAlbum)
 
         todayAlbum.setOnClickListener{
             (context as MainActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.main_frm , AlbumFragment())
                 .commitAllowingStateLoss()
-        }
+        }*/
 
         val bannerAdapter = BannerVPAdapter(this)
         bannerAdapter.addFragment(BannerFragment(R.drawable.img_home_viewpager_exp))
