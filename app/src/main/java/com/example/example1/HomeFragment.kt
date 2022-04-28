@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.example1.databinding.FragmentHomeBinding
+import com.google.gson.Gson
 
 class HomeFragment : Fragment(){
 
@@ -38,10 +39,8 @@ class HomeFragment : Fragment(){
         binding.homeTodayMusicAlbumRv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         albumRVAdapter.setMyItemClickListner(object : AlbumRVAdapter.MyItemClickListener{
-            override fun onItemClick(){
-                (context as MainActivity).supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_frm, AlbumFragment())
-                    .commitAllowingStateLoss()
+            override fun onItemClick(album : Album){
+                changeAlbumFragment(album)
             }
         })
 
@@ -62,6 +61,18 @@ class HomeFragment : Fragment(){
 
         return binding.root
 
+    }
+
+    private fun changeAlbumFragment(album: Album) {
+        (context as MainActivity).supportFragmentManager.beginTransaction()
+            .replace(R.id.main_frm, AlbumFragment().apply {
+                arguments = Bundle().apply {
+                    val gson = Gson()
+                    val albumJson = gson.toJson(album)
+                    putString("album", albumJson)
+                }
+            })
+            .commitAllowingStateLoss()
     }
 
 }

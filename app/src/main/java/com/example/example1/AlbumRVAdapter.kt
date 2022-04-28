@@ -9,11 +9,9 @@ import com.example.example1.databinding.ItemAlbumBinding
 class AlbumRVAdapter(private val albumList : ArrayList<Album>): RecyclerView.Adapter<AlbumRVAdapter.ViewHolder>() {
 
     interface MyItemClickListener{
-        fun onItemClick(){ //외부에서 클릭 이벤트를 사용하기 위해, 외부에서 리스너 객체를 넘겨주어야 한다.
+       fun onItemClick(album : Album)//외부에서 클릭 이벤트를 사용하기 위해, 외부에서 리스너 객체를 넘겨주어야 한다.
             //따라서 외부에서 전달받는 함수랑 외부에서 전달받는 리스너 객체를 어댑터에서 사용할 수 있도록 따로 저장할 변수를 선언해줘야 한다.
 
-
-        }
     }
 
     private lateinit var mItemClickListener: MyItemClickListener
@@ -36,7 +34,7 @@ class AlbumRVAdapter(private val albumList : ArrayList<Album>): RecyclerView.Ada
         //반면에 onCreateViewHolder의 경우, 리사이클러뷰는 처음에 화면에 몇 개 정도의 아이템을 생성하고 이를 계속 재활용하므로 처음에 생성될 때 몇 번 호출되고 말 것이다.
         holder.bind(albumList[position])
         holder.itemView.setOnClickListener{
-            mItemClickListener.onItemClick()
+            mItemClickListener.onItemClick(albumList[position])
         }
     }
 
