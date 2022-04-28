@@ -1,11 +1,35 @@
 package com.example.example1
 
+import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.example1.databinding.ItemAlbumBinding
 
 class AlbumRVAdapter(private val albumList : ArrayList<Album>): RecyclerView.Adapter<AlbumRVAdapter.ViewHolder>() {
+
+    interface MyItemClickListener{
+       fun onItemClick(album : Album)//외부에서 클릭 이벤트를 사용하기 위해, 외부에서 리스너 객체를 넘겨주어야 한다.
+            //따라서 외부에서 전달받는 함수랑 외부에서 전달받는 리스너 객체를 어댑터에서 사용할 수 있도록 따로 저장할 변수를 선언해줘야 한다.
+       fun onRemoveAlbum(position: Int)
+
+    }
+
+    private lateinit var mItemClickListener: MyItemClickListener
+    fun setMyItemClickListner(itemClickListener: MyItemClickListener){
+        mItemClickListener = itemClickListener
+    }
+
+    fun addItem(album : Album){
+        albumList.add(album)
+        notifyDataSetChanged() //RecyclerViewAdAapter는 데이터가 바뀐 것을 모르기 때문에 데이터가 바뀐 것을 알려준다.
+    }
+
+    fun removeItem(position : Int){
+        albumList.removeAt(position)
+        notifyDataSetChanged() //RecyclerViewAdAapter는 데이터가 바뀐 것을 모르기 때문에 데이터가 바뀐 것을 알려준다.
+    }
+
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): AlbumRVAdapter.ViewHolder {
         //ViewHolder를 생성해줘야 할 때 호출되는 함수이다.
         //이곳에서 아이템 뷰 객체를 재활용하기 위해 ViewHolder에 던져줘야 한다.
@@ -20,9 +44,11 @@ class AlbumRVAdapter(private val albumList : ArrayList<Album>): RecyclerView.Ada
         //바인딩할 때마다 호출된다 따라서 사용자가 스크롤할 때마다 호출되는 함수다.
         //반면에 onCreateViewHolder의 경우, 리사이클러뷰는 처음에 화면에 몇 개 정도의 아이템을 생성하고 이를 계속 재활용하므로 처음에 생성될 때 몇 번 호출되고 말 것이다.
         holder.bind(albumList[position])
+        holder.itemView.setOnClickListener { mItemClickListener.onItemClick(albumList[position])}
+        //holder.binding.itemAlbumTitleTv.setOnClickListener { mItemClickListener.onRemoveAlbum(position) }
     }
 
-    override fun getItemCount(): Int = albumList.size
+    override fun getItemCount(): Int = albumList.size //데이터 셋의 크기를 알려주는 함수, 리사이클러뷰의 마지막이 언제인지 알려주는 함수
 
     inner class ViewHolder(val binding : ItemAlbumBinding): RecyclerView.ViewHolder(binding.root){
             fun bind(album : Album){

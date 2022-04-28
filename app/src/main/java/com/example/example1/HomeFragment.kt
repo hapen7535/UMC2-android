@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.example1.databinding.FragmentHomeBinding
+import com.google.gson.Gson
 
 class HomeFragment : Fragment(){
 
@@ -32,15 +34,28 @@ class HomeFragment : Fragment(){
 
         }
 
+        val albumRVAdapter = AlbumRVAdapter(albumDatas)
+        binding.homeTodayMusicAlbumRv.adapter = albumRVAdapter
+        binding.homeTodayMusicAlbumRv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-        val todayAlbum = layoutInflater.inflate(R.layout.item_album, null, false)
+        albumRVAdapter.setMyItemClickListner(object : AlbumRVAdapter.MyItemClickListener{
+            override fun onItemClick(album : Album){
+                changeAlbumFragment(album)
+            }
+
+            override fun onRemoveAlbum(position: Int) {
+                albumRVAdapter.removeItem(position)
+            }
+        })
+
+       /* val todayAlbum = layoutInflater.inflate(R.layout.item_album, null, false)
         binding.homeTodayMusicAlbumRv.addView(todayAlbum)
 
         todayAlbum.setOnClickListener{
             (context as MainActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.main_frm , AlbumFragment())
                 .commitAllowingStateLoss()
-        }
+        }*/
 
         val bannerAdapter = BannerVPAdapter(this)
         bannerAdapter.addFragment(BannerFragment(R.drawable.img_home_viewpager_exp))
@@ -50,6 +65,18 @@ class HomeFragment : Fragment(){
 
         return binding.root
 
+    }
+
+    private fun changeAlbumFragment(album: Album) {
+        (context as MainActivity).supportFragmentManager.beginTransaction()
+            .replace(R.id.main_frm, AlbumFragment().apply {
+                arguments = Bundle().apply {
+                    val gson = Gson()
+                    val albumJson = gson.toJson(album)
+                    putString("album", albumJson)
+                }
+            })
+            .commitAllowingStateLoss()
     }
 
 }
