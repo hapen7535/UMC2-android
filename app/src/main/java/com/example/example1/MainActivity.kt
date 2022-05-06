@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         initBottomNavigation()
         inputDummySongs()
 
-        val song = Song(binding.mainMiniplayerTitleTv.text.toString(), binding.mainMiniplayerSingerTv.text.toString(),0,60,false, "music_lilac")
+     //   val song = Song(binding.mainMiniplayerTitleTv.text.toString(), binding.mainMiniplayerSingerTv.text.toString(),0,60,false, "music_lilac")
 
         binding.mainPlayerCl.setOnClickListener{
             val editor = getSharedPreferences("song", MODE_PRIVATE).edit()
@@ -116,9 +116,7 @@ class MainActivity : AppCompatActivity() {
         val songDB = SongDatabase.getInstance(this)!!
         val songs = songDB.songDao().getSongs()
 
-        if(songs.isNotEmpty()){
-            return
-        }
+        if (songs.isNotEmpty()) return
 
         songDB.songDao().insert(
             Song(
