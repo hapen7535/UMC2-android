@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity //안드로이드에서 Activity의 기능들을 사용할 수 있도록 만들어둔 클래스가 AppCompatActivity이다
 import com.example.example1.databinding.ActivitySongBinding
 import com.google.gson.Gson
@@ -15,11 +16,13 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
 
     lateinit var binding : ActivitySongBinding//lateinit을 이용해서 나중에 초기화를 해준다는 것으로 표시해둔다
     //Binding은 Activity파일과 xml파일을 연결해주는 역할
-    lateinit var song : Song
     lateinit var timer : Timer
     private var mediaPlayer : MediaPlayer?= null //액티비티가 소멸될 때 미디어 플레이어 리소스를 해제시켜줘야 하므로 nullable ? 사용
     private var gson : Gson = Gson()
 
+    val songs = arrayListOf<Song>()
+    lateinit var songDB : SongDatabase
+    var nowPos = 0
 
     override fun onCreate(savedInstanceState: Bundle?) { //onCreate가 AppCompat안에 있으므로 override를 써준다
         super.onCreate(savedInstanceState)
@@ -27,8 +30,49 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
         binding = ActivitySongBinding.inflate(layoutInflater) //inflate는 xml에 표기된 레이아웃들을 메모리에 객체화시키는 역할
         setContentView(binding.root) //xml에 있는 모든 객체들을 사용한다고 명시 xml의 최상단 뷰를 넣어주기 때문
 
+        initPlayList()
         initSong()
-        setPlayer(song)
+        initClickListener()
+
+    }
+    //사용자가 포커스를 잃었을 때 음악 중지
+    override fun onPause() {
+        super.onPause()
+        setPlayerStatus(false)
+        songs[nowPos].second = ((binding.songProgressSb.progress * songs[nowPos].playTime)/100)/1000 //millisecond로 계산되므로 1000으로 나눠줌
+        val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE) //중지되면 재생되고 있던 노래의 데이터를 어딘가 저장해주기 위함
+        val editor = sharedPreferences.edit()
+
+        editor.putInt("songId", songs[nowPos].id)
+
+        editor.apply() //실제 저장이 된다.
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timer.interrupt()
+        mediaPlayer?.release() //불필요한 리소스 해제를 위해 미디어 플레이어가 갖고 있던 리소스 해제
+        mediaPlayer = null //미디어 플레이어 또한 해제
+    }
+
+    private fun initPlayList(){
+        songDB = SongDatabase.getInstance(this)!!
+        songs.addAll(songDB.songDao().getSongs())
+    }
+
+    private fun initSong(){
+        val spf = getSharedPreferences("song", MODE_PRIVATE)
+        val songId = spf.getInt("songId", 0)
+
+        nowPos = getPlayingSongPosition(songId)
+
+        Log.d("now Song ID", songs[nowPos].id.toString()) //확인용
+        startTimer()
+
+        setPlayer(songs[nowPos])
+    }
+
+    private fun initClickListener(){
 
         binding.songDownIb.setOnClickListener{
 
@@ -43,47 +87,49 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
             setPlayerStatus(false)
         }
 
-
-    }
-    //사용자가 포커스를 잃었을 때 음악 중지
-    override fun onPause() {
-        super.onPause()
-        setPlayerStatus(false)
-        song.second = ((binding.songProgressSb.progress * song.playTime)/100)/1000 //millisecond로 계산되므로 1000으로 나눠줌
-        val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE) //중지되면 재생되고 있던 노래의 데이터를 어딘가 저장해주기 위함
-        val editor = sharedPreferences.edit()
-        val songJson = gson.toJson(song)
-        editor.putString("songData",songJson) //하나 하나 넣지 않고 데이터 객체 형태로 보내기 위해 JSON 포맷으로 변환한다.
-
-        editor.apply() //실제 저장이 된다.
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        timer.interrupt()
-        mediaPlayer?.release() //불필요한 리소스 해제를 위해 미디어 플레이어가 갖고 있던 리소스 해제
-        mediaPlayer = null //미디어 플레이어 또한 해제
-    }
-
-    private fun initSong(){
-        if(intent.hasExtra("title")&&intent.hasExtra("singer")){
-            song = Song(
-                intent.getStringExtra("title")!!,
-                intent.getStringExtra("singer")!!,
-                intent.getIntExtra("second", 0),
-                intent.getIntExtra("playTime", 0),
-                intent.getBooleanExtra("isPlaying", false),
-                intent.getStringExtra("music")!!,
-            )
+        binding.songNextIv.setOnClickListener{
+            moveSong(+1)
         }
-        startTimer()
+        binding.songPreviousIv.setOnClickListener {
+            moveSong(-1)
+        }
+    }
+
+    private fun moveSong(direct : Int){
+        if(nowPos + direct < 0){ //이게 처음 노래임
+            Toast.makeText(this, "first song", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if(nowPos + direct >= songs.size){ //다음 노래 없음
+            Toast.makeText(this, "last song", Toast.LENGTH_SHORT).show()
+            return
+        }
+        nowPos += direct //다음 노래로 넘겨준다.
+
+        timer.interrupt() //타이머를 멈추고
+        startTimer() //재시작
+
+        mediaPlayer?.release() //리소스 해제
+        mediaPlayer = null
+
+        setPlayer(songs[nowPos]) //데이터 렌더링
+    }
+
+    private fun getPlayingSongPosition(songId : Int): Int{
+        for(i in 0 until songs.size){
+            if(songs[i].id == songId){
+                return i
+            }
+        }
+        return 0
     }
 
     private fun setPlayer(song : Song){
-        binding.songMusicTitleTv.text = intent.getStringExtra("title")!!
-        binding.songSingerNameTv.text = intent.getStringExtra("singer")!!
+        binding.songMusicTitleTv.text = song.title
+        binding.songSingerNameTv.text = song.singer
         binding.songStartTimeTv.text = String.format("%02d:%02d",song.second / 60, song.second % 60)
         binding.songEndTimeTv.text = String.format("%02d:%02d",song.playTime / 60, song.playTime % 60)
+        binding.songAlbumIv.setImageResource(song.coverImg!!)
         binding.songProgressSb.progress = (song.second * 1000 / song.playTime)
         val music = resources.getIdentifier(song.music, "raw", this.packageName)
         mediaPlayer = MediaPlayer.create(this, music)
@@ -91,7 +137,7 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
     }
 
     fun setPlayerStatus(isPlaying: Boolean){
-        song.isPlaying = isPlaying
+        songs[nowPos].isPlaying = isPlaying
         timer.isPlaying = isPlaying
 
         if(isPlaying){
@@ -109,9 +155,11 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
     }
 
     private fun startTimer(){
-        timer = Timer(song.playTime,song.isPlaying)
+        timer = Timer(songs[nowPos].playTime,songs[nowPos].isPlaying)
         timer.start()
     }
+
+
 
     inner class Timer(private val playTime : Int, var isPlaying: Boolean = true):Thread(){
         private var second : Int = 0
