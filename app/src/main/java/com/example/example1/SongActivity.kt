@@ -93,7 +93,24 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
         binding.songPreviousIv.setOnClickListener {
             moveSong(-1)
         }
+        binding.songLikeIv.setOnClickListener{
+            setLike(songs[nowPos].isLike)
+        }
+
     }
+
+    private fun setLike(isLike : Boolean){ //isLike는 현재 눌려있는지 아닌지 확인용
+        songs[nowPos].isLike = !isLike
+        songDB.songDao().updateIsLikeById(!isLike, songs[nowPos].id)
+
+        if(!isLike){
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_on)
+        }else{
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_off)
+        }
+
+    }
+
 
     private fun moveSong(direct : Int){
         if(nowPos + direct < 0){ //이게 처음 노래임
@@ -131,8 +148,16 @@ class SongActivity : AppCompatActivity()  { //코틀린에서는 extends대신�
         binding.songEndTimeTv.text = String.format("%02d:%02d",song.playTime / 60, song.playTime % 60)
         binding.songAlbumIv.setImageResource(song.coverImg!!)
         binding.songProgressSb.progress = (song.second * 1000 / song.playTime)
+
         val music = resources.getIdentifier(song.music, "raw", this.packageName)
         mediaPlayer = MediaPlayer.create(this, music)
+
+        if(song.isLike){
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_on)
+        }else{
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_off)
+        }
+
         setPlayerStatus(song.isPlaying)
     }
 
