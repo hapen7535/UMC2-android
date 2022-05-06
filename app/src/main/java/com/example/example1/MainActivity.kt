@@ -1,6 +1,7 @@
 package com.example.example1
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -9,6 +10,9 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.example.example1.databinding.ActivityMainBinding
 import com.example.example1.databinding.FragmentAlbumBinding
 import com.google.gson.Gson
@@ -71,9 +75,9 @@ class MainActivity : AppCompatActivity() {
         }.start()
         */
 
-
-        initBottomNavigation()
         inputDummySongs()
+        initBottomNavigation()
+
 
      //   val song = Song(binding.mainMiniplayerTitleTv.text.toString(), binding.mainMiniplayerSingerTv.text.toString(),0,60,false, "music_lilac")
 
@@ -112,8 +116,88 @@ class MainActivity : AppCompatActivity() {
         binding.mainMiniplayerProgressSb.progress = (song.second * 100000)/song.playTime
     }
 
+    override fun onStart(){ //액티비티 전환이 될 때 onStart부터 시작이 되므로 만들어준다.
+        //onStart()가 사용자에게 보여지기 직전의 함수이고 onResume()은 사용자에게 보여지고 난 후의 함수이므로
+        // onStart()에서 UI와 관련된 코드를 초기화해주는 것이 더 안정적이다.
+        super.onStart()
+//        val sharedPreference = getSharedPreferences("song", MODE_PRIVATE) //sharedPreference의 이름
+//        val songJson = sharedPreference.getString("songData", null) //sharedPreference 안에 저장된 데이터의 이름
+//
+//        //가져온 데이터를 저장한다.
+//        song = if(songJson == null){
+//            Song("라일락", "아이유(IU)", 0, 60, false, "music_lilac")
+//        } else{
+//            gson.fromJson(songJson, Song::class.java) //songJson을 Song 클래스에 자바 객체로 변환해주라 요청
+//        }
+
+//        val spf = getSharedPreferences("song", MODE_PRIVATE)
+//        val songId = spf.getInt("songId", 0)
+//
+//        val songDB = SongDatabase.getInstance(this)!!
+//
+//        song = if(songId == 0){ //데이터가 없는 것이므로 제일 처음 저장된 노래를 가져온다.
+//            songDB.songDao().getSongs(1)
+//        }else{
+//            songDB.songDao().getSongs(songId)
+//        }
+//        Log.d("song ID", song.id.toString())
+//
+//        setMiniPlayer(song)
+
+        val spf = getSharedPreferences("song", MODE_PRIVATE)
+        val songId = spf.getInt("songId",0)
+
+        val context : Context = this
+        val songDB = SongDatabase.getInstance(context)!!
+
+        song = if (songId == 0){
+            songDB.songDao().getSong(1)
+        } else{
+            songDB.songDao().getSong(songId)
+        }
+
+        Log.d("song ID", song.id.toString())
+        setMiniPlayer(song)
+    }
+
+
+
+    fun setPlayerStatus(isPlaying: Boolean){
+
+        if(isPlaying){
+            binding.mainMiniplayerBtn.visibility = View.GONE
+            binding.mainPauseBtn.visibility = View.VISIBLE
+        }
+        else{
+            binding.mainMiniplayerBtn.visibility = View.VISIBLE
+            binding.mainPauseBtn.visibility= View.GONE
+        }
+
+    }
+
+
+    private fun initBottomNavigation(){
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_frm, HomeFragment())
+            .commitAllowingStateLoss()
+
+        binding.mainBnv.setOnItemSelectedListener { item ->
+            when(item.itemId){
+                R.id.homeFragment -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_frm, HomeFragment())
+                        .commitNowAllowingStateLoss()
+                    return@setOnItemSelectedListener true
+                }
+            }
+            false
+        }
+    }
+
     private fun inputDummySongs(){
-        val songDB = SongDatabase.getInstance(this)!!
+        val context : Context = this
+        val songDB = SongDatabase.getInstance(context)!!
         val songs = songDB.songDao().getSongs()
 
         if (songs.isNotEmpty()) return
@@ -203,67 +287,5 @@ class MainActivity : AppCompatActivity() {
         Log.d("DB data", _songs.toString())
     }
 
-
-    override fun onStart(){ //액티비티 전환이 될 때 onStart부터 시작이 되므로 만들어준다.
-        //onStart()가 사용자에게 보여지기 직전의 함수이고 onResume()은 사용자에게 보여지고 난 후의 함수이므로
-        // onStart()에서 UI와 관련된 코드를 초기화해주는 것이 더 안정적이다.
-        super.onStart()
-//        val sharedPreference = getSharedPreferences("song", MODE_PRIVATE) //sharedPreference의 이름
-//        val songJson = sharedPreference.getString("songData", null) //sharedPreference 안에 저장된 데이터의 이름
-//
-//        //가져온 데이터를 저장한다.
-//        song = if(songJson == null){
-//            Song("라일락", "아이유(IU)", 0, 60, false, "music_lilac")
-//        } else{
-//            gson.fromJson(songJson, Song::class.java) //songJson을 Song 클래스에 자바 객체로 변환해주라 요청
-//        }
-
-        val spf = getSharedPreferences("song", MODE_PRIVATE)
-        val songId = spf.getInt("songId", 0)
-
-        val songDB = SongDatabase.getInstance(this)!!
-        song = if(songId == 0){ //데이터가 없는 것이므로 제일 처음 저장된 노래를 가져온다.
-            songDB.songDao().getSongs(1)
-        }else{
-            songDB.songDao().getSongs(songId)
-        }
-        Log.d("song ID", song.id.toString())
-
-        setMiniPlayer(song)
-
-    }
-
-    fun setPlayerStatus(isPlaying: Boolean){
-
-        if(isPlaying){
-            binding.mainMiniplayerBtn.visibility = View.GONE
-            binding.mainPauseBtn.visibility = View.VISIBLE
-        }
-        else{
-            binding.mainMiniplayerBtn.visibility = View.VISIBLE
-            binding.mainPauseBtn.visibility= View.GONE
-        }
-
-    }
-
-
-    private fun initBottomNavigation(){
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.main_frm, HomeFragment())
-            .commitAllowingStateLoss()
-
-        binding.mainBnv.setOnItemSelectedListener { item ->
-            when(item.itemId){
-                R.id.homeFragment -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_frm, HomeFragment())
-                        .commitNowAllowingStateLoss()
-                    return@setOnItemSelectedListener true
-                }
-            }
-            false
-        }
-    }
 
 }
