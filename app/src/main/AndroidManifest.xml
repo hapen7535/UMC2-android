@@ -10,23 +10,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Example1">
         <activity
+            android:name=".SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
             android:name=".ThreadExm"
             android:exported="false" />
-
         <activity
             android:name=".SongActivity"
             android:exported="false" />
-
         <activity
             android:name=".MainActivity"
-            android:theme="@style/SplashTh"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/SplashTh">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>
