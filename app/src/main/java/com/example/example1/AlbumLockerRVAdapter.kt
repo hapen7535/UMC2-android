@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.flo.databinding.ItemLockerAlbumBinding
+import com.example.example1.databinding.ItemLockerAlbumBinding
 
 class AlbumLockerRVAdapter (): RecyclerView.Adapter<AlbumLockerRVAdapter.ViewHolder>() {
     private val albums = ArrayList<Album>()
